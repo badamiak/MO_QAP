@@ -23,7 +23,19 @@ namespace MO_QAP
 
         static float Score<T>(DataMatrices data, IEnumerable<T> permutation)
         {
-
+            var score = 0f;
+            var maxIndex = permutation.Count()-1;
+            for(int i = 0; i<= maxIndex; i++)
+            {
+                if(i == maxIndex)
+                {
+                    score += data.MatrixA[permutation[i],permutation[0]] * data.MatrixB[permutation[i],permutation[0]];
+                }
+                else
+                {
+                    score += data.MatrixA[permutation[i],permutation[i+1]] * data.MatrixB[permutation[i],permutation[i+1]];
+                }
+            }
         }
 
         static DataMatrices ReadData(string path)
