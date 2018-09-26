@@ -36,6 +36,7 @@ namespace MO_QAP
                     score += data.MatrixA[permutation[i],permutation[i+1]] * data.MatrixB[permutation[i],permutation[i+1]];
                 }
             }
+            return score;
         }
 
         static DataMatrices ReadData(string path)
