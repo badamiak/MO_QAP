@@ -19,23 +19,31 @@ namespace MO_QAP
 
             var opt2n = Math.Opt2(permutation);
 
+            var test = new[] {11,15,26,7,4,13,12,2,6,18,9,5,1,21,8,14,3,20,19,10,17,25,16,24,22,23};
+            System.Console.WriteLine(Score(data, test));
         }
 
         static float Score<T>(DataMatrices data, IEnumerable<T> permutation)
         {
+            var permutationArray = permutation.Cast<int>().Select(x=>x-1).ToArray();
             var score = 0f;
             var maxIndex = permutation.Count()-1;
-            for(int i = 0; i<= maxIndex; i++)
-            {
-                if(i == maxIndex)
+            foreach(var i in MO_QAP.Math.Range(0,maxIndex))
+                foreach(var j in MO_QAP.Math.Range(0,maxIndex))
                 {
-                    score += data.MatrixA[permutation[i],permutation[0]] * data.MatrixB[permutation[i],permutation[0]];
+                    score += data.MatrixA[permutationArray[i],permutationArray[j]] * data.MatrixB[permutationArray[i],permutationArray[j]];
                 }
-                else
-                {
-                    score += data.MatrixA[permutation[i],permutation[i+1]] * data.MatrixB[permutation[i],permutation[i+1]];
-                }
-            }
+            // for(int i = 0; i<= maxIndex; i++)
+            // {
+            //     if(i == maxIndex)
+            //     {
+            //         score += data.MatrixA[permutationArray[i],permutationArray[0]] * data.MatrixB[permutationArray[i],permutationArray[0]];
+            //     }
+            //     else
+            //     {
+            //         score += data.MatrixA[permutationArray[i],permutationArray[i+1]] * data.MatrixB[permutationArray[i],permutationArray[i+1]];
+            //     }
+            // }
             return score;
         }
 
