@@ -8,7 +8,7 @@ namespace MO_QAP.QapStrategies
     {
         public QapResult<T> SearchBest<T>(Func<IEnumerable<T>, float> scoringStrategy, IEnumerable<T> startingPermutation, CancelationToken cancelationToken)
         {
-            long steps = 0;
+            var steps = 0L;
             var best = new QapResult<T>(startingPermutation, scoringStrategy.Invoke(startingPermutation), steps);
             var last = startingPermutation;
             var watch = new Stopwatch();
@@ -27,7 +27,7 @@ namespace MO_QAP.QapStrategies
             }
 
             watch.Stop();
-            best.totalSolutionsSeen = steps;
+            best.TotalSolutionsSeen = steps;
             return best;
         }
     }

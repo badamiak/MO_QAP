@@ -32,7 +32,7 @@ namespace MO_QAP.QapStrategies
                 }
             }
             watch.Stop();
-            best.totalSolutionsSeen = seenSolutions;
+            best.TotalSolutionsSeen = seenSolutions;
             return best;
         }
     }
