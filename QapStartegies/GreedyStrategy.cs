@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MO_QAP.QapStrategies
 {
@@ -9,22 +10,33 @@ namespace MO_QAP.QapStrategies
         {
             var score = scoringStrategy.Invoke(startingPermutation);
             var steps = 0;
+            var seenSolutions = 0;
             var best = new QapResult<T>(startingPermutation,score, steps);
+            var watch = new Stopwatch();
+            watch.Start();
 
             while(!cancelationToken.IsCancelationPending())
             {
+                var hasNewBest = false;
                 foreach(var permutation in QapMath.Opt2(best.Solution))
                 {
                     steps++;
+                    seenSolutions++;
                     score = scoringStrategy.Invoke(permutation);
 
                     if(score < best.Score)
                     {
-                        best = new QapResult<T>(permutation, score, steps);
+                        best = new QapResult<T>(permutation, score, steps, seenSolutions);
+                        hasNewBest = true;
                         break;
                     }
                 }
+                if(!hasNewBest) break;
             }
+            watch.Stop();
+
+            best.totalSolutionsSeen = seenSolutions;
+            best.FoundIn = watch.Elapsed;
             return best;
         }
     }
