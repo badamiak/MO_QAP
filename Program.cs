@@ -79,17 +79,17 @@ namespace MO_QAP
                 System.Console.WriteLine("OK");
 
                 System.Console.WriteLine("Collecting results");
-                var randomResult = randomStartegyTask.Result as QapResult<int> ?? null;
-                var steepestResult = steepestStrategyTask.Result as QapResult<int> ?? null;
-                var greedyResult = greedyStrategyTask.Result as QapResult<int> ?? null;
+                QapResult<int> randomResult = randomStartegyTask.Result as QapResult<int> ?? null;
+                QapResult<int> steepestResult = steepestStrategyTask.Result as QapResult<int> ?? null;
+                QapResult<int> greedyResult = greedyStrategyTask.Result as QapResult<int> ?? null;
                 System.Console.WriteLine("OK");
 
                 System.Console.WriteLine();
-                System.Console.WriteLine("Results in format <steps>:<score>:<Permutation>");
-                System.Console.WriteLine($"Results for run: {currentRun}");
-                System.Console.WriteLine($"Best random: {randomResult.Steps}:{randomResult.Score}:{String.Join(",",randomResult.Solution)}");
-                System.Console.WriteLine($"Best steepest: {steepestResult.Steps}:{steepestResult.Score}:{String.Join(",",steepestResult.Solution)}");
-                System.Console.WriteLine($"Best greedy: {greedyResult.Steps}:{greedyResult.Score}:{String.Join(",",greedyResult.Solution)}");
+                System.Console.WriteLine($"# Results for run: {currentRun}");
+                System.Console.WriteLine("Results in format <foundIntime>:<solution>/<ofTotalSeen>:<steps>:<score>:<Permutation>");
+                System.Console.WriteLine($"Best random: {randomResult.FoundIn.TotalMilliseconds}:{randomResult.SeenAsSolutionNumber}/{randomResult.TotalSolutionsSeen}:{randomResult.Steps}:{randomResult.Score}:[{String.Join(",",randomResult.Solution)}]");
+                System.Console.WriteLine($"Best steepest: {steepestResult.FoundIn.TotalMilliseconds}:{steepestResult.SeenAsSolutionNumber}/{steepestResult.TotalSolutionsSeen}:{steepestResult.Steps}:{steepestResult.Score}:[{String.Join(",",steepestResult.Solution)}]");
+                System.Console.WriteLine($"Best greedy: {greedyResult.FoundIn.TotalMilliseconds}:{greedyResult.SeenAsSolutionNumber}/{greedyResult.TotalSolutionsSeen}:{greedyResult.Steps}:{greedyResult.Score}:[{String.Join(",",greedyResult.Solution)}]");
             }
         }
 

@@ -10,7 +10,7 @@ namespace MO_QAP
             this.Solution = solution;
             this.Score = score;
             this.Steps = steps;
-            this.SeenAsSolutionNumber = seenSolution;
+            this.SeenAsSolutionNumber = seenAsSolutionNumber;
             this.FoundIn = TimeSpan.FromSeconds(-1);
         }
 

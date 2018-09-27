@@ -9,15 +9,15 @@ namespace MO_QAP.QapStrategies
         public QapResult<T> SearchBest<T>(Func<IEnumerable<T>, float> scoringStrategy, IEnumerable<T> startingPermutation, CancelationToken cancelationToken)
         {
             var score = scoringStrategy.Invoke(startingPermutation);
-            var steps = 0;
+            var steps = 0L;
             var best = new QapResult<T>(startingPermutation,score, steps);
-            var seenSolutions = 0;
+            var seenSolutions = 0L;
             var watch = new Stopwatch();
             watch.Start();
 
             while(!cancelationToken.IsCancelationPending())
             {
-                hasNewBest = false;
+                bool hasNewBest = false;
                 foreach(var permutation in QapMath.Opt2(best.Solution))
                 {
                     steps++;
@@ -28,8 +28,10 @@ namespace MO_QAP.QapStrategies
                     {
                         best = new QapResult<T>(permutation, score, steps,seenSolutions);
                         best.FoundIn = watch.Elapsed;
+                        hasNewBest=true;
                     }
                 }
+                if(!hasNewBest) break;
             }
             watch.Stop();
             best.TotalSolutionsSeen = seenSolutions;
