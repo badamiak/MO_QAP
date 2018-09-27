@@ -11,33 +11,86 @@ namespace MO_QAP
 {
     class Program
     {
+        const int millisecondsInSeconds = 1000;
+        static void HandleHelp()
+        {
+            System.Console.WriteLine("Ussage:");
+            System.Console.WriteLine("MO_QAP [-h]                       : show this help");
+            System.Console.WriteLine("MO_QAP <file> <timeout> <runs>    : run analysis");
+            System.Console.WriteLine("  <file> - input file to use");
+            System.Console.WriteLine("  <timeout> - time that algorithms will run for in seconds");
+            System.Console.WriteLine("  <runs> - how many times should each algorithm be run");
+            System.Console.WriteLine();
+            System.Console.WriteLine("Each run starts with randomly generated permutation");
+            System.Console.WriteLine("Initial permutation is the same, for each algorithm");
+            Environment.Exit(0);
+        }
         static void Main(string[] args)
         {
-            System.Console.WriteLine($"Reading data from {args[0]}");
+            if(args.Contains("-h")) HandleHelp();
+
             
-            var data = ReadData(args[0]);
+            var file = args[0];
+            var timeout = int.Parse(args[1]);
+            var runs = int.Parse(args[2]);
 
-            var permutation =QapMath.Permutate(QapMath.Range(0,5));
+            System.Console.WriteLine($"Input params:");
+            System.Console.WriteLine($"File: {file}");
+            System.Console.WriteLine($"Timeout: {timeout}[s]");
+            System.Console.WriteLine($"Runs: {runs}");
 
-            System.Console.WriteLine(string.Join(",",permutation));
 
-            var opt2n = QapMath.Opt2(permutation);
+            System.Console.WriteLine($"Reading data from input file");
+            var data = ReadData(file);
+            System.Console.WriteLine("OK");
 
-            var test = new[] {11,15,26,7,4,13,12,2,6,18,9,5,1,21,8,14,3,20,19,10,17,25,16,24,22,23};
-            System.Console.WriteLine(Score(data, test));
+            for(var currentRun = 1; currentRun<=runs; currentRun++)
+            {
+                System.Console.WriteLine();
+                System.Console.WriteLine($"### Run: {currentRun} ###");
+                
+                var initialPermutation = QapMath.Permutate(QapMath.Range(1,data.MatricesSize));
+                System.Console.WriteLine($"Initial permutation: {string.Join(",",initialPermutation)}");
+                
+                var cancelationToken = new CancelationToken();
+                
+                var randomStrategy = new RandomStrategy();
+                var steepestStrategy = new SteepestStrategy();
+                var greedyStrategy = new GreedyStrategy();
 
-            var initialPermutation = QapMath.Permutate(QapMath.Range(1,data.MatricesSize));
-            var cancelationToken = new CancelationToken();
-            var randomStrat = new RandomStrategy();
-            var randomStartTask = Task.Run(()=>randomStrat.SearchBest((x)=>Score(data,x), initialPermutation, cancelationToken));
-            var timer = new Timer(60000);
-            timer.Elapsed += (sender,eargs) => cancelationToken.Cancel();
-            timer.Start();
+                Func<IEnumerable<int>, float> scoringFunction = (x)=>Score(data,x);
 
-            randomStartTask.Wait();
-            var randomResult = randomStartTask.Result as QapResult<int> ?? null;
-            System.Console.WriteLine("Results in format <steps>:<score>:<Permutation>");
-            System.Console.WriteLine($"Best random: {randomResult.Steps}:{randomResult.Score}:{String.Join(",",randomResult.Solution)}");
+                var timer = new Timer(timeout*millisecondsInSeconds);
+                timer.Elapsed += (sender,eargs) => cancelationToken.Cancel();
+                
+                System.Console.WriteLine("Starting tasks");
+                var randomStartegyTask = Task.Run(()=>randomStrategy.SearchBest(scoringFunction, initialPermutation, cancelationToken));
+                var steepestStrategyTask = Task.Run(()=>randomStrategy.SearchBest(scoringFunction, initialPermutation, cancelationToken));
+                var greedyStrategyTask = Task.Run(()=>greedyStrategy.SearchBest(scoringFunction, initialPermutation, cancelationToken));
+                
+                System.Console.WriteLine("OK");
+
+                System.Console.WriteLine("Starting timer");
+                timer.Start();
+                System.Console.WriteLine("OK");
+
+                System.Console.WriteLine("Awaiting tasks to finish");
+                Task.WaitAll(new []{randomStartegyTask, steepestStrategyTask,greedyStrategyTask});
+                System.Console.WriteLine("OK");
+
+                System.Console.WriteLine("Collecting results");
+                var randomResult = randomStartegyTask.Result as QapResult<int> ?? null;
+                var steepestResult = steepestStrategyTask.Result as QapResult<int> ?? null;
+                var greedyResult = greedyStrategyTask.Result as QapResult<int> ?? null;
+                System.Console.WriteLine("OK");
+
+                System.Console.WriteLine();
+                System.Console.WriteLine("Results in format <steps>:<score>:<Permutation>");
+                System.Console.WriteLine($"Results for run: {currentRun}");
+                System.Console.WriteLine($"Best random: {randomResult.Steps}:{randomResult.Score}:{String.Join(",",randomResult.Solution)}");
+                System.Console.WriteLine($"Best steepest: {steepestResult.Steps}:{steepestResult.Score}:{String.Join(",",steepestResult.Solution)}");
+                System.Console.WriteLine($"Best greedy: {greedyResult.Steps}:{greedyResult.Score}:{String.Join(",",greedyResult.Solution)}");
+            }
         }
 
         static float Score<T>(DataMatrices data, IEnumerable<T> permutation)
