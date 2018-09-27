@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MO_QAP
 {
-    public static class Math
+    public static class QapMath
     {
         ///Use for generating increasing value ranges
         ///<param name="to">inclusive</param>
@@ -26,7 +26,7 @@ namespace MO_QAP
             var indexesAvailability = new Dictionary<int,bool>();
             var distinctValues = values.Distinct().ToArray();
 
-            foreach(var index in Range(0,distinctValues.Count()-2))
+            foreach(var index in Range(0,distinctValues.Count()-1))
             {
                 indexesAvailability.Add(index, true);
             }

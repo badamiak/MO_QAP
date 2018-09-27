@@ -8,6 +8,6 @@ namespace MO_QAP.QapStrategies
     public interface IQapStrategy
     {
         ///<param name="scoringStrategy">Function accepting currently analyzed solution and returning score for that solution</param>
-        QapResult<T> SearchBest<T>(Func<IEnumerable<T>, float> scoringStrategy, IEnumerable<T> startingPermutation, bool cancelationToken = false);
+        QapResult<T> SearchBest<T>(Func<IEnumerable<T>, float> scoringStrategy, IEnumerable<T> startingPermutation, CancelationToken cancelationToken);
     }
 }

@@ -6,12 +6,12 @@ namespace MO_QAP
     {
         public QapResult(IEnumerable<T> solution, float score, long steps)
         {
-            this.solution = solution;
+            this.Solution = solution;
             this.Score = score;
             this.Steps = steps;
         }
 
-        public IEnumerable<T> solution {get;}
+        public IEnumerable<T> Solution {get;}
         public float Score {get;}
         public long Steps {get;}
     }
