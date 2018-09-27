@@ -28,22 +28,12 @@ namespace MO_QAP
             var permutationArray = permutation.Cast<int>().Select(x=>x-1).ToArray();
             var score = 0f;
             var maxIndex = permutation.Count()-1;
+            
             foreach(var i in MO_QAP.Math.Range(0,maxIndex))
                 foreach(var j in MO_QAP.Math.Range(0,maxIndex))
                 {
-                    score += data.MatrixA[permutationArray[i],permutationArray[j]] * data.MatrixB[permutationArray[i],permutationArray[j]];
+                    score += data.MatrixA[i,j] * data.MatrixB[permutationArray[i],permutationArray[j]];
                 }
-            // for(int i = 0; i<= maxIndex; i++)
-            // {
-            //     if(i == maxIndex)
-            //     {
-            //         score += data.MatrixA[permutationArray[i],permutationArray[0]] * data.MatrixB[permutationArray[i],permutationArray[0]];
-            //     }
-            //     else
-            //     {
-            //         score += data.MatrixA[permutationArray[i],permutationArray[i+1]] * data.MatrixB[permutationArray[i],permutationArray[i+1]];
-            //     }
-            // }
             return score;
         }
 
