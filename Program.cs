@@ -15,11 +15,12 @@ namespace MO_QAP
         static void HandleHelp()
         {
             System.Console.WriteLine("Ussage:");
-            System.Console.WriteLine("MO_QAP [-h]                       : show this help");
-            System.Console.WriteLine("MO_QAP <file> <timeout> <runs>    : run analysis");
+            System.Console.WriteLine("MO_QAP [-h]                                   : show this help");
+            System.Console.WriteLine("MO_QAP <file> <timeout> <runs> [<output>]     : run analysis");
             System.Console.WriteLine("  <file> - input file to use");
             System.Console.WriteLine("  <timeout> - time that algorithms will run for in seconds");
             System.Console.WriteLine("  <runs> - how many times should each algorithm be run");
+            System.Console.WriteLine("  <output> - output file in csv forma");
             System.Console.WriteLine();
             System.Console.WriteLine("Each run starts with randomly generated permutation");
             System.Console.WriteLine("Initial permutation is the same, for each algorithm");
@@ -33,16 +34,25 @@ namespace MO_QAP
             var file = args[0];
             var timeout = int.Parse(args[1]);
             var runs = int.Parse(args[2]);
+            var output = args.Count() == 4
+                ? args[3]
+                : string.Empty;
 
             System.Console.WriteLine($"Input params:");
             System.Console.WriteLine($"File: {file}");
             System.Console.WriteLine($"Timeout: {timeout}[s]");
             System.Console.WriteLine($"Runs: {runs}");
+            System.Console.WriteLine($"Output: {output}");
 
 
             System.Console.WriteLine($"Reading data from input file");
             var data = ReadData(file);
             System.Console.WriteLine("OK");
+
+            var randomResults = new List<QapResult<int>>();
+            var steepestResults = new List<QapResult<int>>();
+            var greedyResults = new List<QapResult<int>>();
+            
 
             for(var currentRun = 1; currentRun<=runs; currentRun++)
             {
@@ -82,6 +92,11 @@ namespace MO_QAP
                 QapResult<int> randomResult = randomStartegyTask.Result as QapResult<int> ?? null;
                 QapResult<int> steepestResult = steepestStrategyTask.Result as QapResult<int> ?? null;
                 QapResult<int> greedyResult = greedyStrategyTask.Result as QapResult<int> ?? null;
+
+                randomResults.Add(randomResult);
+                steepestResults.Add(steepestResult);
+                greedyResults.Add(greedyResult);
+
                 System.Console.WriteLine("OK");
 
                 System.Console.WriteLine();
@@ -90,6 +105,27 @@ namespace MO_QAP
                 System.Console.WriteLine($"Best random: {randomResult.FoundIn.TotalMilliseconds}:{randomResult.SeenAsSolutionNumber}/{randomResult.TotalSolutionsSeen}:{randomResult.Steps}:{randomResult.Score}:[{String.Join(",",randomResult.Solution)}]");
                 System.Console.WriteLine($"Best steepest: {steepestResult.FoundIn.TotalMilliseconds}:{steepestResult.SeenAsSolutionNumber}/{steepestResult.TotalSolutionsSeen}:{steepestResult.Steps}:{steepestResult.Score}:[{String.Join(",",steepestResult.Solution)}]");
                 System.Console.WriteLine($"Best greedy: {greedyResult.FoundIn.TotalMilliseconds}:{greedyResult.SeenAsSolutionNumber}/{greedyResult.TotalSolutionsSeen}:{greedyResult.Steps}:{greedyResult.Score}:[{String.Join(",",greedyResult.Solution)}]");
+            }
+
+            if(!string.IsNullOrEmpty(output))
+            {
+                using(var writer = new StreamWriter(File.OpenWrite(output)))
+                {
+                    writer.WriteLine("algorithm,time,solutionNr,totalSolutions,steps,score,solution");
+
+                    foreach(var solution in randomResults)
+                    {
+                        writer.WriteLine($"random,{solution.ToCsvLine()}");
+                    }
+                    foreach(var solution in steepestResults)
+                    {
+                        writer.WriteLine($"steepest,{solution.ToCsvLine()}");
+                    }
+                    foreach(var solution in greedyResults)
+                    {
+                        writer.WriteLine($"greedy,{solution.ToCsvLine()}");
+                    }
+                }
             }
         }
 

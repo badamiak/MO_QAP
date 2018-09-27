@@ -20,5 +20,10 @@ namespace MO_QAP
         public long SeenAsSolutionNumber{get;}
         public long TotalSolutionsSeen{get;set;} = 0;
         public TimeSpan FoundIn {get; set;}
+
+        public string ToCsvLine()
+        {
+            return $"{Math.Round(this.FoundIn.TotalMilliseconds)},{this.SeenAsSolutionNumber},{this.TotalSolutionsSeen},{this.Steps},{this.Score},[{string.Join(";",this.Solution)}]";
+        }
     }
 }
